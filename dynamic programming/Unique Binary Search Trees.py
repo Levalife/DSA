@@ -92,3 +92,24 @@ class Solution:
             self.mem[n] = sum([self.numTrees(i - 1) * self.numTrees(n - i) for i in range(1, n + 1)])
 
         return self.mem.get(n)
+
+
+# similar approach but more readable
+
+class Solution:
+    def numTrees(self, n: int) -> int:
+        self.memo = dict()
+        return self.helper(n)
+
+    def helper(self, n):
+        if n == 0 or n == 1:
+            return 1
+
+        if self.memo.get(n):
+            return self.memo[n]
+
+        f = 0
+        for i in range(1, n + 1):
+            f += self.helper(i - 1) * self.helper(n - i)
+        self.memo[n] = f
+        return f

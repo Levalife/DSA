@@ -1,5 +1,6 @@
 '''
 
+BACKTRACKING
 https://leetcode.com/problems/partition-to-k-equal-sum-subsets/
 
 https://www.youtube.com/watch?v=qpgqhp_9d1s

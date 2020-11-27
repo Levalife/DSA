@@ -1,73 +1,70 @@
 '''
 
-Knuth-Morris-Pratt Substring Search
 
-Given a string s and a pattern p, determine if the pattern exists in the string. Return the index of where the first
-occurrence starts.
+BACKTRACKING
 
-https://www.youtube.com/watch?v=BXCEFAzhxGY
-
-https://www.youtube.com/watch?v=GTJr8OvyEVQ
-https://www.youtube.com/watch?v=KG44VoDtsAA
-
-We will preprocess the pattern string and create an array that indicates the longest proper prefix which is also suffix
-at each point in the pattern string.
-
-If we can find the length of the longest prefix that matches a suffix to that point, we can skip len(prefix) comparisons
- at the beginning.
-
-The key reason we care about the prefix to suffix is because we want to "teleport" back to as early in the string to the
-point that we still know that there is a match.
-
-Our goal is to minimize going backwards in our search string.
+https://leetcode.com/problems/sudoku-solver/
+https://www.youtube.com/watch?v=JzONv5kaPJM
 
 
 '''
 
-istring = 'abxabcabcaby'
-substring = 'abcaby'
 
-substring2 = "aabaabaaa"
+class Solution:
+    def solveSudoku(self, board: List[List[str]]) -> None:
+        """
+        Do not return anything, modify board in-place instead.
+        """
+        self.helper(board, 0, 0)
+        
+        
+    def helper(self, board, i, j):
 
+        # if we got to the last cell of the board - we have found the solution and can stop searching
+        if i == len(board) and j == 0:
+            return True
 
-def kmp_matching(s, subs):
-    table = ["_" for _ in subs]
-    i = 0
-    j = 1
-    table[0] = 0
-
-    # create prefix/suffix table
-
-    while j < len(subs):
-
-        if subs[i] == subs[j]:
-            table[j] = i + 1
-            i += 1
-            j += 1
+        if board[i][j] == ".":
+            # is cell is empty - try all numbers from 1 to 9
+            k = 1
+            while k < 10:
+                # if number satisfy all sudoku conditions - try next cell (next in row or next row first column if
+                # current cell is last in the row
+                if self.is_valid(board, i, j, str(k)):
+                    board[i][j] = str(k)  # make choise
+                    if j == len(board) - 1:
+                        if self.helper(board, i + 1, 0):
+                            return True
+                    else:
+                        if self.helper(board, i, j + 1):
+                            return True
+                    board[i][j] = "."  # unchoice previous choice
+                k += 1
         else:
-            if i == 0:
-                table[j] = 0
-                j += 1
+            # if cell is not empty - skip square
+            if j == len(board) - 1:
+                if self.helper(board, i + 1, 0):
+                    return True
             else:
-                i = table[i - 1]
+                if self.helper(board, i, j + 1):
+                    return True
+                    
 
-    i = 0
-    j = 0
-
-    while i < len(s) and j < len(subs):
-        if s[i] == subs[j]:
-            i += 1
-            j += 1
-        else:
-            if j == 0:
-                i += 1
-            else:
-                j = table[j - 1]
-
-    if j == len(subs):
-        return i-j, s[i - j: i]
-    return -1
-
-
-print(kmp_matching(istring, substring))
-# kmp_matching(istring, substring2)
+        
+    def is_valid(self, board, i, j, num):
+        
+        if num in board[i]:
+            return False
+        
+        for k in range(len(board)):
+            if num == board[k][j]:
+                return False
+            
+        mod_i = i % 3
+        mod_j = j % 3
+        for sub_i in range(i - mod_i, i - mod_i + 3):
+            for sub_j in range(j - mod_j, j - mod_j + 3):
+                if board[sub_i][sub_j] == num:
+                    return False
+                
+        return True
